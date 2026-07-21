@@ -194,6 +194,7 @@ const Attendance = ({ user }) => {
                     </span>
                   </td>
                 </tr>
+              ))}
               {history.length === 0 && !loading && (
                 <tr>
                   <td colSpan="5" style={{ textAlign: "center", color: "var(--text-muted)", padding: "30px" }}>

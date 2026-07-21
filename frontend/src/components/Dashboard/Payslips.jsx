@@ -136,6 +136,7 @@ const Payslips = ({ user }) => {
                       </div>
                     </td>
                   </tr>
+                ))}
                 {slips.length === 0 && !loading && (
                   <tr>
                     <td colSpan={isAdmin ? 6 : 5} style={{ textAlign: "center", color: "var(--text-muted)", padding: "30px" }}>
