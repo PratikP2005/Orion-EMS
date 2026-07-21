@@ -6,6 +6,8 @@ const Payslips = ({ user }) => {
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [viewingSlip, setViewingSlip] = useState(null);
 
+  const [sortOrder, setSortOrder] = useState("recent");
+  const [searchQuery, setSearchQuery] = useState("");
   const [slips, setSlips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [employees, setEmployees] = useState([]);
@@ -81,6 +83,17 @@ const Payslips = ({ user }) => {
     }
   };
 
+  const filteredSlips = slips.filter(slip => 
+    (slip.name || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (slip.employeeId || "").toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const sortedSlips = [...filteredSlips].sort((a, b) => {
+    const dateA = new Date(`${a.month} 1, ${a.year}`);
+    const dateB = new Date(`${b.month} 1, ${b.year}`);
+    return sortOrder === "recent" ? dateB - dateA : dateA - dateB;
+  });
+
   return (
     <div>
       <div className="no-print">
@@ -97,7 +110,28 @@ const Payslips = ({ user }) => {
         </div>
 
         <div className="card-panel">
-          <h3 style={{ marginBottom: "20px" }}>{isAdmin ? "Recent Payroll History" : "Your Salary Slips"}</h3>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
+            <h3 style={{ margin: 0 }}>{isAdmin ? "Recent Payroll History" : "Your Salary Slips"}</h3>
+            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+              {isAdmin && (
+                <input 
+                  type="text" 
+                  placeholder="Search employee..." 
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  style={{ padding: "6px 12px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--bg-main)", color: "var(--text-main)", fontSize: "0.9rem" }}
+                />
+              )}
+              <select 
+                value={sortOrder} 
+                onChange={e => setSortOrder(e.target.value)}
+                style={{ padding: "6px 12px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--bg-main)", color: "var(--text-main)", fontSize: "0.9rem", cursor: "pointer" }}
+              >
+                <option value="recent">Sort by: Newest First</option>
+                <option value="old">Sort by: Oldest First</option>
+              </select>
+            </div>
+          </div>
           
           <div style={{ overflowX: "auto" }}>
             <table className="data-table">
@@ -112,7 +146,7 @@ const Payslips = ({ user }) => {
                 </tr>
               </thead>
               <tbody>
-                {slips.map((slip) => (
+                {sortedSlips.map((slip) => (
                   <tr key={slip.id}>
                     {isAdmin && <td><span style={{ fontWeight: "500" }}>{slip.name}</span></td>}
                     <td>{slip.month} {slip.year}</td>

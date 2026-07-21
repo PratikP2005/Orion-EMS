@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -21,6 +22,12 @@ public class TaskController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @GetMapping
+    public ResponseEntity<List<Task>> getAllTasks() {
+        List<Task> tasks = taskRepository.findAll();
+        return ResponseEntity.ok(tasks);
+    }
 
     @PostMapping
     public ResponseEntity<?> createTask(@RequestBody CreateTaskRequest request) {

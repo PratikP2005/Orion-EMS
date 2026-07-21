@@ -6,7 +6,7 @@ import LeaveManagement from "./LeaveManagement";
 import Payslips from "./Payslips";
 import Settings from "./Settings";
 
-const AdminDashboard = ({ user, onLogout }) => {
+const AdminDashboard = ({ user, onLogout, onUpdateUser }) => {
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const renderContent = () => {
@@ -20,7 +20,7 @@ const AdminDashboard = ({ user, onLogout }) => {
       case "payslips":
         return <Payslips user={user} />;
       case "settings":
-        return <Settings user={user} />;
+        return <Settings user={user} onUpdateUser={onUpdateUser} />;
       default:
         return <DashboardOverview user={user} />;
     }

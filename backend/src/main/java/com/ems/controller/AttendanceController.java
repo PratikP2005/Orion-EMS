@@ -23,6 +23,12 @@ public class AttendanceController {
     @Autowired
     private UserRepository userRepository;
 
+    @GetMapping
+    public ResponseEntity<List<AttendanceRecord>> getAllAttendance() {
+        List<AttendanceRecord> records = attendanceRepository.findAll();
+        return ResponseEntity.ok(records);
+    }
+
     @GetMapping("/employee/{employeeId}")
     public ResponseEntity<List<AttendanceRecord>> getEmployeeAttendance(@PathVariable Long employeeId) {
         List<AttendanceRecord> records = attendanceRepository.findByEmployeeId(employeeId);

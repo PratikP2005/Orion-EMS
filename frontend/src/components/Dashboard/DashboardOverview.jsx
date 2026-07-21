@@ -6,30 +6,43 @@ const DashboardOverview = ({ user }) => {
     employees: 0,
     leaveRequests: 0,
     attendanceToday: 0,
-    totalTasks: 0
+    totalTasks: 0,
+    recentLeaves: []
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // In a real app, these would be separate API calls or an aggregate endpoint
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const [empRes, taskRes] = await Promise.all([
+        const [empRes, taskRes, leaveRes, attRes] = await Promise.all([
           fetch("/api/employees"),
-          fetch("/api/tasks")
+          fetch("/api/tasks"),
+          fetch("/api/leaves"),
+          fetch("/api/attendance")
         ]);
         
         let employees = [];
         let tasks = [];
+        let leaves = [];
+        let attendance = [];
+        
         if (empRes.ok) employees = await empRes.json();
         if (taskRes.ok) tasks = await taskRes.json();
+        if (leaveRes.ok) leaves = await leaveRes.json();
+        if (attRes.ok) attendance = await attRes.json();
+        
+        const today = new Date().toISOString().split('T')[0];
+        const pendingLeaves = leaves.filter(l => l.status && l.status.toUpperCase() === "PENDING");
+        const presentToday = attendance.filter(a => a.date === today && (a.status === "Present" || a.status === "On Time" || a.status === "Late")).length;
+        const activeTasks = tasks.filter(t => t.status && (t.status.toUpperCase() === "IN_PROGRESS" || t.status.toUpperCase() === "TODO")).length;
         
         setStats({
           employees: employees.length,
-          leaveRequests: 0,
-          attendanceToday: 0,
-          totalTasks: tasks.length
+          leaveRequests: pendingLeaves.length,
+          attendanceToday: presentToday,
+          totalTasks: activeTasks,
+          recentLeaves: pendingLeaves.slice(0, 5) // Just show top 5 recent ones
         });
       } catch (err) {
         console.error("Error fetching stats:", err);
@@ -94,10 +107,34 @@ const DashboardOverview = ({ user }) => {
         </div>
       </div>
       
-      {/* Additional admin content could go here, e.g. recent activity feed */}
       <div className="card-panel">
-        <h3 style={{ marginBottom: "16px" }}>Recent Activity</h3>
-        <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>No recent activity to show.</p>
+        <h3 style={{ marginBottom: "16px" }}>Recent Activity: Pending Leaves</h3>
+        {stats.recentLeaves.length > 0 ? (
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Type</th>
+                <th>Dates</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.recentLeaves.map(leave => (
+                <tr key={leave.id}>
+                  <td style={{ fontWeight: "500" }}>
+                    {leave.employee ? `${leave.employee.firstName || ''} ${leave.employee.lastName || ''}`.trim() || leave.employee.email : "Unknown"}
+                  </td>
+                  <td>{leave.type}</td>
+                  <td>{leave.dates}</td>
+                  <td>{leave.reason}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>No pending leave requests to show.</p>
+        )}
       </div>
     </div>
   );

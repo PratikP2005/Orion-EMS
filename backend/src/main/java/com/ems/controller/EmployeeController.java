@@ -33,6 +33,15 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeOpt.get());
     }
 
+    @GetMapping("/by-email")
+    public ResponseEntity<?> getEmployeeByEmail(@RequestParam String email) {
+        Optional<User> employeeOpt = userRepository.findByEmail(email);
+        if (employeeOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with email: " + email);
+        }
+        return ResponseEntity.ok(employeeOpt.get());
+    }
+
     @PostMapping
     public ResponseEntity<?> createEmployee(@RequestBody CreateEmployeeRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {

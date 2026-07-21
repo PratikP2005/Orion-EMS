@@ -36,11 +36,15 @@ const Sidebar = ({ user, activeTab, setActiveTab, handleLogout }) => {
         </div>
 
         <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: "8px", padding: "16px", display: "flex", alignItems: "center", gap: "12px", marginBottom: "30px", border: "1px solid rgba(255,255,255,0.1)" }}>
-          <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: "600", fontSize: "0.9rem" }}>
-            {initials}
+          <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: "600", fontSize: "0.9rem", overflow: "hidden" }}>
+            {user?.avatar ? (
+              <img src={user.avatar} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              initials
+            )}
           </div>
           <div style={{ overflow: "hidden" }}>
-            <div style={{ color: "white", fontSize: "0.9rem", fontWeight: "600", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>{user?.name}</div>
+            <div style={{ color: "white", fontSize: "0.9rem", fontWeight: "600", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>{user?.name || user?.email}</div>
             <div style={{ color: "#94a3b8", fontSize: "0.75rem" }}>{isAdmin ? "Administrator" : "Employee"}</div>
           </div>
         </div>

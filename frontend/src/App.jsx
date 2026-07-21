@@ -25,6 +25,14 @@ function App() {
     localStorage.setItem("ems_user", JSON.stringify(userData));
   };
 
+  const handleUpdateUser = (updatedData) => {
+    setUser(prev => {
+      const newUser = { ...prev, ...updatedData };
+      localStorage.setItem("ems_user", JSON.stringify(newUser));
+      return newUser;
+    });
+  };
+
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem("ems_user");
@@ -43,9 +51,9 @@ function App() {
   }
 
   return user.role?.toUpperCase() === "ADMIN" ? (
-    <AdminDashboard user={user} onLogout={handleLogout} />
+    <AdminDashboard user={user} onLogout={handleLogout} onUpdateUser={handleUpdateUser} />
   ) : (
-    <EmployeeDashboard user={user} onLogout={handleLogout} />
+    <EmployeeDashboard user={user} onLogout={handleLogout} onUpdateUser={handleUpdateUser} />
   );
 }
 

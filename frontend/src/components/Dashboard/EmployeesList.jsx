@@ -140,6 +140,9 @@ const EmployeesList = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterRole, setFilterRole] = useState("");
+  const [filterDept, setFilterDept] = useState("");
 
   const fetchEmployees = async () => {
     try {
@@ -167,10 +170,13 @@ const EmployeesList = () => {
     fetchEmployees();
   };
 
-  const filteredEmployees = employees.filter(e => 
-    (e.name || "").toLowerCase().includes(search.toLowerCase()) || 
-    (e.email || "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredEmployees = employees.filter(e => {
+    const matchesSearch = (e.name || "").toLowerCase().includes(search.toLowerCase()) || 
+                          (e.email || "").toLowerCase().includes(search.toLowerCase());
+    const matchesRole = filterRole ? e.role === filterRole : true;
+    const matchesDept = filterDept ? e.department === filterDept : true;
+    return matchesSearch && matchesRole && matchesDept;
+  });
 
   return (
     <div>
@@ -195,10 +201,41 @@ const EmployeesList = () => {
             style={{ paddingLeft: "40px" }} 
           />
         </div>
-        <button className="btn-outline" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <button className="btn-outline" style={{ display: "flex", alignItems: "center", gap: "8px" }} onClick={() => setShowFilters(!showFilters)}>
           <Filter size={18} /> Filters
         </button>
       </div>
+
+      {showFilters && (
+        <div className="card-panel" style={{ marginBottom: "20px", display: "flex", gap: "16px", padding: "16px" }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: "block", marginBottom: "6px", fontSize: "0.9rem", color: "var(--text-muted)" }}>Role</label>
+            <select value={filterRole} onChange={e => setFilterRole(e.target.value)} style={{ padding: "8px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--bg-main)", color: "var(--text-main)", width: "100%" }}>
+              <option value="">All Roles</option>
+              <option value="ADMIN">Admin</option>
+              <option value="EMPLOYEE">Employee</option>
+            </select>
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: "block", marginBottom: "6px", fontSize: "0.9rem", color: "var(--text-muted)" }}>Department</label>
+            <select value={filterDept} onChange={e => setFilterDept(e.target.value)} style={{ padding: "8px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--bg-main)", color: "var(--text-main)", width: "100%" }}>
+              <option value="">All Departments</option>
+              <option value="Engineering">Engineering</option>
+              <option value="IT">IT</option>
+              <option value="HR">HR</option>
+              <option value="QA">QA</option>
+              <option value="Product">Product</option>
+              <option value="Design">Design</option>
+              <option value="Data">Data</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Sales">Sales</option>
+            </select>
+          </div>
+          <div style={{ display: "flex", alignItems: "flex-end" }}>
+            <button className="btn-outline" onClick={() => { setFilterRole(""); setFilterDept(""); }}>Clear</button>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)" }}>Loading employees...</div>
