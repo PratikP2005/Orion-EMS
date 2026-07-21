@@ -1,0 +1,22 @@
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Backend
+backend/target/
+backend/*.iml
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+backend/.idea/
+
+# General
+.DS_Store
+Thumbs.db
+node_modules/
