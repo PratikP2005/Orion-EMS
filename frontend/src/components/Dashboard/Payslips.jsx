@@ -150,7 +150,7 @@ const Payslips = ({ user }) => {
                   <tr key={slip.id}>
                     {isAdmin && <td><span style={{ fontWeight: "500" }}>{slip.name}</span></td>}
                     <td>{slip.month} {slip.year}</td>
-                    <td style={{ fontWeight: "600", color: "#10b981" }}>${slip.net.toLocaleString()}</td>
+                    <td style={{ fontWeight: "600", color: "#10b981" }}>₹{slip.net.toLocaleString()}</td>
                     <td>{slip.date}</td>
                     <td>
                       <span style={{ padding: "4px 10px", borderRadius: "20px", fontSize: "0.8rem", fontWeight: "500", background: "rgba(16, 185, 129, 0.1)", color: "#10b981" }}>
@@ -234,25 +234,25 @@ const Payslips = ({ user }) => {
                   <h3 style={{ borderBottom: "1px solid #e5e7eb", paddingBottom: "10px", marginBottom: "16px" }}>Earnings</h3>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
                     <span>Basic Salary</span>
-                    <span>${viewingSlip.basic.toLocaleString()}</span>
+                    <span>₹{viewingSlip.basic.toLocaleString()}</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
                     <span>Allowances</span>
-                    <span>${viewingSlip.allowances.toLocaleString()}</span>
+                    <span>₹{viewingSlip.allowances.toLocaleString()}</span>
                   </div>
                 </div>
                 <div style={{ flex: 1 }}>
                   <h3 style={{ borderBottom: "1px solid #e5e7eb", paddingBottom: "10px", marginBottom: "16px" }}>Deductions</h3>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
                     <span>Tax & Insurance</span>
-                    <span>${viewingSlip.deductions.toLocaleString()}</span>
+                    <span>₹{viewingSlip.deductions.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
               
               <div style={{ background: "#f9fafb", padding: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "2px solid #111827" }}>
                 <h3 style={{ margin: 0 }}>Net Salary</h3>
-                <h2 style={{ margin: 0, color: "#10b981", fontSize: "28px" }}>${viewingSlip.net.toLocaleString()}</h2>
+                <h2 style={{ margin: 0, color: "#10b981", fontSize: "28px" }}>₹{viewingSlip.net.toLocaleString()}</h2>
               </div>
               
               <div style={{ marginTop: "60px", textAlign: "center", color: "#9ca3af", fontSize: "12px", fontStyle: "italic" }}>

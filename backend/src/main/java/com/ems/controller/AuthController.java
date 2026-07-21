@@ -31,7 +31,7 @@ public class AuthController {
 
         // Return user details without password for security
         String fullName = user.getFirstName() + (user.getLastName() != null && !user.getLastName().isEmpty() ? " " + user.getLastName() : "");
-        UserResponse response = new UserResponse(user.getId(), fullName, user.getEmail(), user.getRole());
+        UserResponse response = new UserResponse(user.getId(), fullName, user.getEmail(), user.getRole(), user.getAvatar());
         return ResponseEntity.ok(response);
     }
 
@@ -57,13 +57,15 @@ public class AuthController {
         private String name;
         private String email;
         private String role;
+        private String avatar;
 
         public UserResponse() {}
-        public UserResponse(Long id, String name, String email, String role) {
+        public UserResponse(Long id, String name, String email, String role, String avatar) {
             this.id = id;
             this.name = name;
             this.email = email;
             this.role = role;
+            this.avatar = avatar;
         }
 
         public Long getId() { return id; }
@@ -74,5 +76,7 @@ public class AuthController {
         public void setEmail(String email) { this.email = email; }
         public String getRole() { return role; }
         public void setRole(String role) { this.role = role; }
+        public String getAvatar() { return avatar; }
+        public void setAvatar(String avatar) { this.avatar = avatar; }
     }
 }

@@ -30,6 +30,10 @@ public class User {
     @Column(length = 1000)
     private String bio;
     
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String avatar;
+
     private String department;
     private String position;
 
@@ -92,6 +96,9 @@ public class User {
 
     public String getBio() { return bio; }
     public void setBio(String bio) { this.bio = bio; }
+
+    public String getAvatar() { return avatar; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
 
     public String getDepartment() { return department; }
     public void setDepartment(String department) { this.department = department; }

@@ -43,14 +43,27 @@ const Login = ({ onLogin }) => {
   return (
     <div className="split-layout">
       <div className="split-left">
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
+          <img 
+            src="/logo.png" 
+            alt="Orion EMS Logo" 
+            style={{ 
+              width: "48px", 
+              height: "48px", 
+              borderRadius: "12px", 
+              objectFit: "cover",
+              boxShadow: "0 6px 18px rgba(0, 0, 0, 0.4)" 
+            }} 
+          />
+          <span style={{ fontSize: "1.6rem", fontWeight: "700", color: "white", letterSpacing: "-0.5px" }}>Orion EMS</span>
+        </div>
         <h1 style={{ fontWeight: "700" }}>
-          Welcome back to<br/>
-          Employee<br/>
-          Management<br/>
-          System
+          Next-Generation<br/>
+          Enterprise Workforce<br/>
+          Management System
         </h1>
         <p style={{ marginTop: "1rem" }}>
-          Streamline your HR workflows, manage employee data, attendance, and payroll all in one unified platform.
+          Streamline your HR workflows, manage employee directories, attendance, leaves, and payroll all in one unified platform.
         </p>
 
         <div style={{ marginTop: "3rem", display: "flex", gap: "16px" }}>

@@ -12,7 +12,17 @@ const LeaveManagement = ({ user }) => {
   const fetchLeaves = async () => {
     try {
       setLoading(true);
-      const url = isAdmin ? "/api/leaves" : `/api/leaves/employee/${user.id}`;
+      let targetId = user?.id;
+
+      if (!targetId && user?.email) {
+        const byEmailRes = await fetch(`/api/employees/by-email?email=${encodeURIComponent(user.email)}`);
+        if (byEmailRes.ok) {
+          const resolvedUser = await byEmailRes.json();
+          targetId = resolvedUser.id;
+        }
+      }
+
+      const url = isAdmin ? "/api/leaves" : `/api/leaves/employee/${targetId}`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
@@ -42,7 +52,7 @@ const LeaveManagement = ({ user }) => {
 
   React.useEffect(() => {
     fetchLeaves();
-  }, [user.id, isAdmin]);
+  }, [user.id, user.email, isAdmin]);
 
   const handleStatusUpdate = async (id, newStatus) => {
     try {
@@ -58,8 +68,23 @@ const LeaveManagement = ({ user }) => {
   const handleApply = async (e) => {
     e.preventDefault();
     try {
+      let targetId = user?.id;
+
+      if (!targetId && user?.email) {
+        const byEmailRes = await fetch(`/api/employees/by-email?email=${encodeURIComponent(user.email)}`);
+        if (byEmailRes.ok) {
+          const resolvedUser = await byEmailRes.json();
+          targetId = resolvedUser.id;
+        }
+      }
+
+      if (!targetId) {
+        alert("Employee account could not be identified.");
+        return;
+      }
+
       const payload = {
-        employeeId: user.id,
+        employeeId: targetId,
         type: formData.type,
         dates: `${formData.startDate} to ${formData.endDate}`,
         reason: formData.reason
@@ -73,6 +98,9 @@ const LeaveManagement = ({ user }) => {
         setShowModal(false);
         setFormData({ type: "", startDate: "", endDate: "", reason: "" });
         fetchLeaves();
+      } else {
+        const errText = await res.text();
+        alert(errText || "Failed to submit leave application.");
       }
     } catch (e) {
       console.error(e);

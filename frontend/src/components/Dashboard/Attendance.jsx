@@ -11,7 +11,19 @@ const Attendance = ({ user }) => {
   const fetchAttendance = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/attendance/employee/${user.id}`);
+      let targetId = user?.id;
+
+      if (!targetId && user?.email) {
+        const byEmailRes = await fetch(`/api/employees/by-email?email=${encodeURIComponent(user.email)}`);
+        if (byEmailRes.ok) {
+          const resolvedUser = await byEmailRes.json();
+          targetId = resolvedUser.id;
+        }
+      }
+
+      if (!targetId) return;
+
+      const res = await fetch(`/api/attendance/employee/${targetId}`);
       if (res.ok) {
         const data = await res.json();
         
@@ -43,7 +55,7 @@ const Attendance = ({ user }) => {
 
   useEffect(() => {
     fetchAttendance();
-  }, [user.id]);
+  }, [user.id, user.email]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -52,13 +64,28 @@ const Attendance = ({ user }) => {
 
   const handleToggleClock = async () => {
     try {
+      let targetId = user?.id;
+
+      if (!targetId && user?.email) {
+        const byEmailRes = await fetch(`/api/employees/by-email?email=${encodeURIComponent(user.email)}`);
+        if (byEmailRes.ok) {
+          const resolvedUser = await byEmailRes.json();
+          targetId = resolvedUser.id;
+        }
+      }
+
+      if (!targetId) {
+        alert("Unable to identify employee account.");
+        return;
+      }
+
       const todayStr = new Date().toISOString().split('T')[0];
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       
       if (!clockedIn) {
         // Clock In
         const payload = {
-          employeeId: user.id,
+          employeeId: targetId,
           date: todayStr,
           checkIn: timeStr,
           dayType: "Office"
@@ -68,11 +95,16 @@ const Attendance = ({ user }) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
-        if (res.ok) fetchAttendance();
+        if (res.ok) {
+          fetchAttendance();
+        } else {
+          const errText = await res.text();
+          alert(errText || "Clock in failed.");
+        }
       } else {
         // Clock Out
         const payload = {
-          employeeId: user.id,
+          employeeId: targetId,
           date: todayStr,
           checkOut: timeStr
         };
@@ -81,7 +113,12 @@ const Attendance = ({ user }) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
-        if (res.ok) fetchAttendance();
+        if (res.ok) {
+          fetchAttendance();
+        } else {
+          const errText = await res.text();
+          alert(errText || "Clock out failed.");
+        }
       }
     } catch (e) {
       console.error(e);

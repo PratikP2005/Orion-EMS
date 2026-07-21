@@ -135,10 +135,128 @@ const AddEmployeeModal = ({ onClose, onAdded }) => {
   );
 };
 
+const EditEmployeeModal = ({ employee, onClose, onUpdated }) => {
+  const [formData, setFormData] = useState({
+    firstName: employee.firstName || (employee.name ? employee.name.split(" ")[0] : ""),
+    lastName: employee.lastName || (employee.name ? employee.name.split(" ").slice(1).join(" ") : ""),
+    email: employee.email || "",
+    phoneNumber: employee.phoneNumber || "",
+    joinDate: employee.joinDate || "",
+    department: employee.department || "",
+    position: employee.position || "",
+    role: employee.role || "EMPLOYEE",
+    basicSalary: employee.basicSalary || 0,
+    allowances: employee.allowances || 0,
+    deductions: employee.deductions || 0
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/employees/${employee.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+      if (response.ok) {
+        onUpdated();
+      } else {
+        alert("Failed to update employee details.");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content" style={{ padding: "30px", maxWidth: "600px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+          <h2>Edit Employee Details</h2>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer" }}><X /></button>
+        </div>
+        
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={{ display: "flex", gap: "16px" }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: "0.9rem", fontWeight: "500", display: "block", marginBottom: "6px" }}>First Name</label>
+              <input type="text" required value={formData.firstName} onChange={(e) => setFormData({...formData, firstName: e.target.value})} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: "0.9rem", fontWeight: "500", display: "block", marginBottom: "6px" }}>Last Name</label>
+              <input type="text" required value={formData.lastName} onChange={(e) => setFormData({...formData, lastName: e.target.value})} />
+            </div>
+          </div>
+          
+          <div style={{ display: "flex", gap: "16px" }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: "0.9rem", fontWeight: "500", display: "block", marginBottom: "6px" }}>Email</label>
+              <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: "0.9rem", fontWeight: "500", display: "block", marginBottom: "6px" }}>Phone Number</label>
+              <input type="text" value={formData.phoneNumber} onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})} />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: "16px" }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: "0.9rem", fontWeight: "500", display: "block", marginBottom: "6px" }}>Department</label>
+              <select value={formData.department} onChange={(e) => setFormData({...formData, department: e.target.value})}>
+                <option value="">Select Department</option>
+                <option value="Engineering">Engineering</option>
+                <option value="IT">IT</option>
+                <option value="HR">HR</option>
+                <option value="QA">QA</option>
+                <option value="Product">Product</option>
+                <option value="Design">Design</option>
+                <option value="Data">Data</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Sales">Sales</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: "0.9rem", fontWeight: "500", display: "block", marginBottom: "6px" }}>Position</label>
+              <input type="text" required value={formData.position} onChange={(e) => setFormData({...formData, position: e.target.value})} />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: "16px" }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: "0.9rem", fontWeight: "500", display: "block", marginBottom: "6px" }}>System Role</label>
+              <select value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})}>
+                <option value="EMPLOYEE">Employee</option>
+                <option value="ADMIN">Admin</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: "0.9rem", fontWeight: "500", display: "block", marginBottom: "6px" }}>Basic Salary (₹)</label>
+              <input type="number" required value={formData.basicSalary} onChange={(e) => setFormData({...formData, basicSalary: parseFloat(e.target.value)})} />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "16px" }}>
+            <button type="button" className="btn-outline" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const EmployeesList = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState(null);
+  const [activeMenuId, setActiveMenuId] = useState(null);
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [filterRole, setFilterRole] = useState("");
@@ -166,7 +284,12 @@ const EmployeesList = () => {
   }, []);
 
   const handleAdded = () => {
-    setShowModal(false);
+    setShowAddModal(false);
+    fetchEmployees();
+  };
+
+  const handleUpdated = () => {
+    setEditingEmployee(null);
     fetchEmployees();
   };
 
@@ -185,7 +308,7 @@ const EmployeesList = () => {
           <h1 style={{ fontSize: "1.8rem" }}>Employees</h1>
           <p style={{ color: "var(--text-muted)" }}>Manage your workforce directory.</p>
         </div>
-        <button className="btn-primary" onClick={() => setShowModal(true)}>
+        <button className="btn-primary" onClick={() => setShowAddModal(true)}>
           <Plus size={18} /> Add Employee
         </button>
       </div>
@@ -242,14 +365,56 @@ const EmployeesList = () => {
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "20px" }}>
           {filteredEmployees.map(emp => (
-            <div key={emp.id} className="card-panel" style={{ padding: "20px" }}>
+            <div key={emp.id} className="card-panel" style={{ padding: "20px", position: "relative" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
                 <div style={{ width: "48px", height: "48px", borderRadius: "8px", background: "rgba(92, 92, 252, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "#5c5cfc", fontWeight: "bold", fontSize: "1.2rem" }}>
                   {emp.name ? emp.name.substring(0, 2).toUpperCase() : "EM"}
                 </div>
-                <button style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" }}>
-                  <MoreVertical size={18} />
-                </button>
+                <div style={{ position: "relative" }}>
+                  <button 
+                    onClick={() => setActiveMenuId(activeMenuId === emp.id ? null : emp.id)}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: "4px" }}
+                  >
+                    <MoreVertical size={18} />
+                  </button>
+
+                  {activeMenuId === emp.id && (
+                    <div style={{
+                      position: "absolute",
+                      right: 0,
+                      top: "28px",
+                      background: "var(--bg-main, #ffffff)",
+                      border: "1px solid var(--border-color, #e2e8f0)",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                      zIndex: 10,
+                      minWidth: "130px",
+                      overflow: "hidden"
+                    }}>
+                      <button 
+                        onClick={() => {
+                          setEditingEmployee(emp);
+                          setActiveMenuId(null);
+                        }}
+                        style={{
+                          width: "100%",
+                          padding: "10px 14px",
+                          border: "none",
+                          background: "none",
+                          textAlign: "left",
+                          cursor: "pointer",
+                          fontSize: "0.85rem",
+                          color: "var(--text-main, #1e293b)",
+                          fontWeight: "500"
+                        }}
+                        onMouseEnter={(e) => e.target.style.background = "rgba(92, 92, 252, 0.08)"}
+                        onMouseLeave={(e) => e.target.style.background = "none"}
+                      >
+                        ✏️ Edit Details
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
               <h3 style={{ margin: "0 0 4px 0" }}>{emp.name}</h3>
               <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", margin: "0 0 12px 0" }}>{emp.position || "Staff"} • {emp.department || "General"}</p>
@@ -263,7 +428,8 @@ const EmployeesList = () => {
         </div>
       )}
 
-      {showModal && <AddEmployeeModal onClose={() => setShowModal(false)} onAdded={handleAdded} />}
+      {showAddModal && <AddEmployeeModal onClose={() => setShowAddModal(false)} onAdded={handleAdded} />}
+      {editingEmployee && <EditEmployeeModal employee={editingEmployee} onClose={() => setEditingEmployee(null)} onUpdated={handleUpdated} />}
     </div>
   );
 };

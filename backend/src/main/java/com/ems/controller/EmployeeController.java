@@ -96,9 +96,36 @@ public class EmployeeController {
         if (request.getBio() != null) {
             user.setBio(request.getBio());
         }
+        if (request.getAvatar() != null) {
+            user.setAvatar(request.getAvatar());
+        }
 
         User updatedUser = userRepository.save(user);
         return ResponseEntity.ok(updatedUser);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateEmployee(@PathVariable Long id, @RequestBody CreateEmployeeRequest request) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        User employee = userOpt.get();
+        if (request.getFirstName() != null) employee.setFirstName(request.getFirstName());
+        if (request.getLastName() != null) employee.setLastName(request.getLastName());
+        if (request.getEmail() != null) employee.setEmail(request.getEmail());
+        if (request.getDepartment() != null) employee.setDepartment(request.getDepartment());
+        if (request.getPosition() != null) employee.setPosition(request.getPosition());
+        if (request.getPhoneNumber() != null) employee.setPhoneNumber(request.getPhoneNumber());
+        if (request.getJoinDate() != null) employee.setJoinDate(request.getJoinDate());
+        if (request.getRole() != null) employee.setRole(request.getRole().toUpperCase());
+        if (request.getBasicSalary() > 0) employee.setBasicSalary(request.getBasicSalary());
+        if (request.getAllowances() >= 0) employee.setAllowances(request.getAllowances());
+        if (request.getDeductions() >= 0) employee.setDeductions(request.getDeductions());
+
+        User saved = userRepository.save(employee);
+        return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{id}/password")
@@ -167,6 +194,7 @@ public class EmployeeController {
         private String name;
         private String position;
         private String bio;
+        private String avatar;
 
         public UpdateProfileRequest() {}
 
@@ -176,6 +204,8 @@ public class EmployeeController {
         public void setPosition(String position) { this.position = position; }
         public String getBio() { return bio; }
         public void setBio(String bio) { this.bio = bio; }
+        public String getAvatar() { return avatar; }
+        public void setAvatar(String avatar) { this.avatar = avatar; }
     }
 
     public static class UpdatePasswordRequest {

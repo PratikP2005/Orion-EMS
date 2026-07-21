@@ -34,9 +34,29 @@ const Settings = ({ user, onUpdateUser }) => {
         return;
       }
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         const base64Image = reader.result;
         setAvatar(base64Image);
+        
+        let targetId = user?.id;
+        if (!targetId && user?.email) {
+          try {
+            const byEmailRes = await fetch(`/api/employees/by-email?email=${encodeURIComponent(user.email)}`);
+            if (byEmailRes.ok) {
+              const resolvedUser = await byEmailRes.json();
+              targetId = resolvedUser.id;
+            }
+          } catch (e) { console.error(e); }
+        }
+
+        if (targetId) {
+          fetch(`/api/employees/${targetId}/profile`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, position, bio, avatar: base64Image })
+          }).catch(console.error);
+        }
+
         if (onUpdateUser) {
           onUpdateUser({ avatar: base64Image });
         }
@@ -69,7 +89,7 @@ const Settings = ({ user, onUpdateUser }) => {
         const res = await fetch(`/api/employees/${targetId}/profile`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, position, bio })
+          body: JSON.stringify({ name, position, bio, avatar })
         });
         
         if (!res.ok) {

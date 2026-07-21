@@ -37,6 +37,10 @@ public class LeaveController {
 
     @PostMapping
     public ResponseEntity<?> requestLeave(@RequestBody CreateLeaveRequest request) {
+        if (request.getEmployeeId() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Employee ID is required.");
+        }
+
         Optional<User> employeeOpt = userRepository.findById(request.getEmployeeId());
         if (employeeOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid employee ID.");
