@@ -19,6 +19,15 @@ A full-stack Employee Management System built with React and Spring Boot. Handle
 
 ---
 
+## Future Improvements
+
+- **Notification System**: Real-time alerts for leave approvals and task assignments using WebSockets.
+- **Export & Reporting**: Enhanced CSV/PDF export capabilities for HR attendance and payroll reports.
+- **Interactive Analytics**: Add charts (e.g., Recharts) for attendance trends, leave utilization, and task completion rates.
+- **Advanced Role Permissions**: Finer granular permissions for department managers and team leads.
+
+---
+
 ## Tech Stack
 
 ### Frontend
